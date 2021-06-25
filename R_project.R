@@ -1,0 +1,91 @@
+# Loading necessary packages
+
+library(dplyr)
+
+library(ggplot2)
+
+library(forcats)
+
+
+
+# Loading files csv. In detail table "gdp_world_regions_stacked_data.csv" (saved as GDP_nations), which contain data about GDP, and table "total_gov_expenditure_gdp_data.csv" (saved as Debt_nations) about countries debt.
+
+Debt_nations <- read.csv("total_gov_expenditure_gdp_data.csv")
+
+GDP_nations <- read.csv("gdp_world_regions_stacked_data.csv")
+
+
+
+# Selecting and visualizing top 10 countries with greatest GDP in 2018 (saved as top_GDP data.frame)
+
+top_10_GDP <- GDP_nations %>%
+  + select(Entity, Code, Year, GDP) %>%
+  + filter(Year == 2018 & (Code != "" & Code != "OWID_WRL")) %>%
+  + group_by(Entity) %>%
+  + arrange(desc(GDP)) %>%
+  + head(., 10)
+
+top_10_GDP$Entity <- as.factor(top_10_GDP$Entity)
+
+ggplot(top_10_GDP, aes(GDP, fct_reorder(Entity, GDP))) 
+  + geom_col() 
+  + labs(title = "World GDP Countries", subtitle = "Top 10 countries with highest GDP", y = "Country")
+
+
+
+#Selecting and visualizing GDP trend among Years (1850 - 2018) by regions (saved as GDP_trend_byregion) 
+
+GDP_trend_byregion <- GDP_nations %>%
+  + filter(Code == "") %>%
+  + arrange(desc(Entity))
+
+ggplot(GDP_trend_byregion, aes(Year, GDP, color = Entity)) 
+  + geom_line() 
+  + labs(title = "GDP trend", subtitle = "Growing of GDP along regions between 1850 and 2018")
+
+
+
+# Selecting top 10 GDP grow rate from 1950 to 2018 (saved as top_10_GDP_grow_rate)
+
+GDP_2018 <- GDP_nations %>%
+  +     group_by(Entity) %>%
+  +     filter(Year == "2018" & Code != "" & Code != "OWID_WRL") %>%
+  +     arrange(Entity) %>%
+  + select(Entity, GDP)
+
+GDP_1950 <- GDP_nations %>%
+  +     group_by(Entity) %>%
+  +     filter(Year == "1950" & Code != "" & Code != "OWID_WRL") %>%
+  +     arrange(Entity) %>%
+  +     select(Entity, GDP)
+
+top_10_GDP_grow_rate <- GDP_2018 %>%
+  +     inner_join(GDP_1950, by = "Entity", suffix = c(".2018", ".1950")) %>%
+  +     mutate(grow_rate = (GDP.2018 - GDP.1950) / GDP.1950) %>%
+  +     arrange(desc(grow_rate)) %>%
+  +     head(., 10)
+
+top_10_GDP_grow_rate$Entity <- as.factor(top_10_GDP_grow_rate$Entity)
+
+ggplot(top_10_GDP_grow_rate, aes(grow_rate, fct_reorder(Entity, grow_rate))) 
+  + geom_col() 
+  + labs(title = "Highest grow rates", subtitle = "Ten countries with highest grow rate amon 1950 and 2018", y = "Country")
+
+
+
+# Selecting and visualizing top 10 nations with highest expense percent on GDP (saved as top_10_expense_percent)
+
+colnames(Debt_nations) <- c("Country", "Code", "Year", "Expenditure")
+
+top_10_expense_percent <- Debt_nations %>%
+  +     filter(Year == "2016" & Code != "" & Code != "OWID_WRL") %>%
+  +     arrange(desc(Expenditure)) %>%
+  +     select(Country, Expenditure) %>%
+  +     head(., 10)
+
+top_10_expense_percent$Country <- as.factor(top_10_expense_percent$Country)
+
+ggplot(top_10_expense_percent, aes(Expenditure, fct_reorder(Country, Expenditure))) 
++ geom_col() 
++ labs(title = "Expenditure % on GDP", subtitle = "Ten highest countries expenditure in relation to GDP")
+
