@@ -86,6 +86,6 @@ top_10_expense_percent <- Debt_nations %>%
 top_10_expense_percent$Country <- as.factor(top_10_expense_percent$Country)
 
 ggplot(top_10_expense_percent, aes(Expenditure, fct_reorder(Country, Expenditure))) 
-+ geom_col() 
-+ labs(title = "Expenditure % on GDP", subtitle = "Ten highest countries expenditure in relation to GDP")
+  + geom_col() 
+  + labs(title = "Expenditure % on GDP", subtitle = "Ten highest countries expenditure in relation to GDP")
 
