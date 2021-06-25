@@ -1,4 +1,4 @@
--R_GDP-
+_R_GDP_
 
 Analysis about the groeth of nations GDP around the world. Two main issue: GDP changes from 1950 and 2016 and expenture percent in relation to GDP on 2016.
 
